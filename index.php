@@ -1,218 +1,161 @@
+<?php // U Festival App ?>
 <!DOCTYPE html>
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<title>Festival App</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>U Festival</title>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-<link rel="stylesheet" href="style/style.css">
+<link rel="stylesheet" href="style.css">
 </head>
-<body data-theme="light">
-
+<body>
 <div id="app">
-  <!-- TOP BAR -->
-  <header class="topbar">
+  <div class="topbar">
     <div class="topbar-logo">
-      <!-- Logo SVG inline (black/white adaptive) -->
-      <svg viewBox="0 0 220 40" xmlns="http://www.w3.org/2000/svg" id="logo-svg">
-        <text x="0" y="30" font-family="Sansation, sans-serif" font-weight="700" font-size="26" fill="currentColor">❤️U Festival</text>
+      <svg width="34" height="34" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" fill="black"/>
+        <!-- Heart -->
+        <path d="M50 38 C50 38 35 25 25 32 C15 39 18 52 30 60 L50 76 L70 60 C82 52 85 39 75 32 C65 25 50 38 50 38Z" fill="#F03228"/>
+        <!-- U -->
+        <path d="M32 30 L32 55 C32 65 40 72 50 72 C60 72 68 65 68 55 L68 30" stroke="white" stroke-width="10" stroke-linecap="round" fill="none"/>
       </svg>
+      <span class="topbar-logo-text">Festival</span>
     </div>
     <div class="topbar-controls">
-      <button class="ctrl-btn flag-btn" id="langBtn" title="Language" onclick="toggleLang()">🇳🇱</button>
-      <button class="ctrl-btn" id="themeBtn" onclick="toggleTheme()" title="Theme">
-        <span class="material-icons-round" style="font-size:18px" id="themeIcon">dark_mode</span>
+      <button class="ctrl-btn" onclick="toggleLang()" id="langBtn" title="Taal">🇳🇱</button>
+      <button class="ctrl-btn" onclick="toggleTheme()" title="Thema">
+        <span class="material-icons-round" id="themeIcon" style="font-size:18px">dark_mode</span>
       </button>
     </div>
-  </header>
+  </div>
 
-  <!-- SCREENS -->
   <div class="screens">
-
     <!-- HOME -->
-    <section class="screen active" id="screen-home">
+    <div class="screen active" id="screen-home">
       <div class="hero-section">
         <div class="hero-date" id="hero-date">Zaterdag 6 september 2025 • Utrecht</div>
         <div class="hero-title" id="hero-title">Welkom bij<br>❤️U Festival</div>
         <div class="hero-subtitle" id="hero-subtitle">Het festival voor (nieuwe) studenten in de regio Utrecht — een aanvulling op UIT. Strijkviertel, Utrecht.</div>
       </div>
-
       <div class="section-label" id="news-label">Nieuws &amp; Meldingen</div>
-
-      <div class="news-card news-card-info" onclick="openPopup('info-news')">
-        <span class="news-card-tag tag-info" id="tag-info">Info</span>
-        <div class="news-card-title" id="nc1-title">Deuren open om 12:00</div>
-        <div class="news-card-body" id="nc1-body">Het festivalterrein is geopend van 12:00 tot 23:00 uur. Houd je ticket en ID bij de hand.</div>
-        <div class="news-card-time">Zaterdag 6 september</div>
+      <div class="news-card news-card-info" onclick="openPopup('nc1')">
+        <div class="news-card-tag tag-info">Info</div>
+        <div class="news-card-title" id="nc1-title">Deuren open om 10:00</div>
+        <div class="news-card-body" id="nc1-body">Het festivalterrein is geopend van 10:00 tot 23:45 uur. Houd je ticket en ID bij de hand.</div>
       </div>
-
-      <div class="news-card news-card-accent" onclick="openPopup('update-news')">
-        <span class="news-card-tag tag-update" id="tag-update">Info</span>
+      <div class="news-card news-card-info" onclick="openPopup('nc2')">
+        <div class="news-card-tag tag-info">Info</div>
         <div class="news-card-title" id="nc2-title">Gratis shuttlebus vanaf Utrecht Centraal</div>
-        <div class="news-card-body" id="nc2-body">Pak de gratis shuttlebus aan de Mineurslaan. Volg de witte bordjes met zwarte pijlen én '❤️U Festival'.</div>
-        <div class="news-card-time">Zaterdag 6 september</div>
+        <div class="news-card-body" id="nc2-body">Pak de gratis shuttlebus aan de Mineurslaan. Rijdt heen tot 19:00, terug vanaf 21:00.</div>
       </div>
-
-      <div class="news-card news-card-lineup" onclick="openPopup('lineup-news')">
-        <span class="news-card-tag tag-lineup" id="tag-lineup">Info</span>
+      <div class="news-card news-card-info" onclick="openPopup('nc3')">
+        <div class="news-card-tag tag-info">Info</div>
         <div class="news-card-title" id="nc3-title">Lockers beschikbaar op het terrein</div>
         <div class="news-card-body" id="nc3-body">Huur een medium of grote locker op het terrein. Niet online te reserveren.</div>
-        <div class="news-card-time">Zaterdag 6 september</div>
       </div>
-
-      <div class="news-card news-card-info" onclick="openPopup('parking-news')">
-        <span class="news-card-tag tag-info">Info</span>
-        <div class="news-card-title" id="nc4-title">Parkeren: VOL = VOL</div>
-        <div class="news-card-body" id="nc4-body">Parkeer op P+R Papendorp. Koop je ticket online van tevoren. PIN ONLY bij de parkeerwachter op locatie.</div>
-        <div class="news-card-time">Zaterdag 6 september</div>
+      <div class="news-card news-card-info" onclick="openPopup('nc4')">
+        <div class="news-card-tag tag-info">Info</div>
+        <div class="news-card-title" id="nc4-title">Parkeren: VOL=VOL</div>
+        <div class="news-card-body" id="nc4-body">Parkeer op P+R Papendorp. Koop je ticket online van tevoren. PIN ONLY bij parkeerwachter.</div>
       </div>
-    </section>
+    </div>
 
     <!-- INFO -->
-    <section class="screen" id="screen-info">
+    <div class="screen" id="screen-info">
       <div class="section-label" id="info-screen-label">Festival Informatie</div>
       <div id="accordion-container"></div>
-    </section>
+    </div>
 
     <!-- SCHEDULE -->
-    <section class="screen" id="screen-schedule">
+    <div class="screen" id="screen-schedule">
       <div class="section-label" id="sched-label">Festivalprogramma</div>
-
       <div class="day-selector">
-        <button class="day-btn active" id="day1-btn" onclick="setDay(1)">
-          Dag 1<span>Zat 13 jun</span>
-        </button>
-        <button class="day-btn" id="day2-btn" onclick="setDay(2)">
-          Dag 2<span>Zon 14 jun</span>
-        </button>
+        <button class="day-btn active" id="day1-btn" onclick="setDay(1)">Dag 1<span>Zat 6 sep</span></button>
+        <button class="day-btn" id="day2-btn" onclick="setDay(2)">Dag 2<span>Zo 7 sep</span></button>
       </div>
-
       <div class="stage-tabs" id="stage-tabs">
         <button class="stage-tab active" onclick="setStage('all',this)" id="tab-all">Alles</button>
-        <button class="stage-tab" onclick="setStage('main',this)">Main Stage</button>
-        <button class="stage-tab" onclick="setStage('cave',this)">Cave</button>
-        <button class="stage-tab" onclick="setStage('forest',this)">Forest</button>
-        <button class="stage-tab" onclick="setStage('underground',this)">Underground</button>
+        <button class="stage-tab" onclick="setStage('poton',this)">Poton</button>
+        <button class="stage-tab" onclick="setStage('thelake',this)">The Lake</button>
+        <button class="stage-tab" onclick="setStage('theclub',this)">The Club</button>
+        <button class="stage-tab" onclick="setStage('hanggar',this)">Hanggar</button>
       </div>
-
-      <div class="time-grid" id="time-grid"></div>
-    </section>
+      <div id="time-grid"></div>
+    </div>
 
     <!-- MAP -->
-    <section class="screen" id="screen-map">
+    <div class="screen" id="screen-map">
       <div class="section-label" id="map-label">Festivalkaart</div>
-
       <div class="map-container">
-        <svg class="map-svg" viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg" id="festival-map">
-          <!-- Ground -->
-          <rect width="300" height="330" fill="#1a1a2e" rx="4"/>
-          <!-- Grass areas -->
-          <ellipse cx="150" cy="160" rx="130" ry="120" fill="#1e3a2f" opacity=".8"/>
-          <!-- Paths -->
-          <line x1="150" y1="310" x2="150" y2="50" stroke="#2d2d2d" stroke-width="14" opacity=".7"/>
-          <line x1="20" y1="165" x2="280" y2="165" stroke="#2d2d2d" stroke-width="10" opacity=".6"/>
-          <line x1="80" y1="90" x2="220" y2="240" stroke="#2d2d2d" stroke-width="8" opacity=".4"/>
-
-          <!-- MAIN STAGE -->
-          <rect x="110" y="30" width="80" height="50" rx="6" fill="#F03228" opacity=".9"/>
-          <text x="150" y="50" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="8" font-weight="700">MAIN</text>
-          <text x="150" y="62" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="7">STAGE</text>
-
-          <!-- CAVE STAGE -->
-          <rect x="20" y="110" width="70" height="44" rx="6" fill="#247BA0" opacity=".9"/>
-          <text x="55" y="128" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="8" font-weight="700">CAVE</text>
-          <text x="55" y="140" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="7">STAGE</text>
-
-          <!-- FOREST STAGE -->
-          <rect x="210" y="100" width="70" height="44" rx="6" fill="#E3B505" opacity=".9"/>
-          <text x="245" y="118" text-anchor="middle" fill="#000" font-family="Sansation,sans-serif" font-size="8" font-weight="700">FOREST</text>
-          <text x="245" y="130" text-anchor="middle" fill="#000" font-family="Sansation,sans-serif" font-size="7">STAGE</text>
-
-          <!-- UNDERGROUND STAGE -->
-          <rect x="80" y="220" width="80" height="44" rx="6" fill="#8B5CF6" opacity=".9"/>
-          <text x="120" y="238" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="7" font-weight="700">UNDERGROUND</text>
-          <text x="120" y="250" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="7">STAGE</text>
-
-          <!-- ENTRANCE -->
-          <rect x="120" y="290" width="60" height="30" rx="4" fill="#444"/>
-          <text x="150" y="309" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="8">INGANG</text>
-
-          <!-- FOOD AREA -->
-          <circle cx="200" cy="190" r="22" fill="#2d5a27" stroke="#4a7c59" stroke-width="1.5"/>
-          <text x="200" y="188" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="7" font-weight="700">FOOD</text>
-          <text x="200" y="198" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="7">&amp; BAR</text>
-
+        <svg class="map-svg" viewBox="0 0 400 440" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="440" fill="var(--bg2)"/>
+          <!-- terrain outline -->
+          <path d="M30 60 L370 60 L370 380 L30 380 Z" fill="none" stroke="var(--border)" stroke-width="2" stroke-dasharray="8,4"/>
+          <!-- Main entrance -->
+          <rect x="160" y="360" width="80" height="20" rx="4" fill="var(--cerulean)" opacity=".3"/>
+          <text x="200" y="374" text-anchor="middle" font-size="9" fill="var(--cerulean)" font-weight="700">INGANG</text>
+          <!-- Poton stage -->
+          <rect x="140" y="80" width="120" height="70" rx="8" fill="rgba(240,50,40,.2)" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="200" y="118" text-anchor="middle" font-size="11" fill="var(--accent)" font-weight="700">POTON</text>
+          <text x="200" y="132" text-anchor="middle" font-size="9" fill="var(--fg2)">Hoofdpodium</text>
+          <!-- The Lake -->
+          <rect x="40" y="180" width="100" height="60" rx="8" fill="rgba(36,123,160,.2)" stroke="var(--cerulean)" stroke-width="1.5"/>
+          <text x="90" y="213" text-anchor="middle" font-size="10" fill="var(--cerulean)" font-weight="700">THE LAKE</text>
+          <text x="90" y="227" text-anchor="middle" font-size="9" fill="var(--fg2)">Talentpodium</text>
+          <!-- The Club -->
+          <rect x="260" y="180" width="100" height="60" rx="8" fill="rgba(227,181,5,.2)" stroke="var(--saffron)" stroke-width="1.5"/>
+          <text x="310" y="213" text-anchor="middle" font-size="10" fill="var(--saffron)" font-weight="700">THE CLUB</text>
+          <text x="310" y="227" text-anchor="middle" font-size="9" fill="var(--fg2)">Entertainment</text>
+          <!-- Hanggar -->
+          <rect x="140" y="270" width="120" height="60" rx="8" fill="rgba(139,92,246,.2)" stroke="var(--purple)" stroke-width="1.5"/>
+          <text x="200" y="303" text-anchor="middle" font-size="10" fill="var(--purple)" font-weight="700">HANGGAR</text>
+          <text x="200" y="317" text-anchor="middle" font-size="9" fill="var(--fg2)">DJ stage</text>
+          <!-- Food -->
+          <circle cx="80" cy="310" r="18" fill="rgba(240,50,40,.1)" stroke="var(--accent)" stroke-width="1.5" onclick="openPopup('loc-food')" style="cursor:pointer"/>
+          <text x="80" y="314" text-anchor="middle" font-size="9" fill="var(--accent)" font-weight="700">🍺</text>
           <!-- EHBO -->
-          <circle cx="60" cy="210" r="16" fill="#dc2626" opacity=".85"/>
-          <text x="60" y="208" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="9" font-weight="700">+</text>
-          <text x="60" y="218" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="6">EHBO</text>
-
-          <!-- TOILETS -->
-          <circle cx="230" cy="240" r="14" fill="#374151" stroke="#6b7280" stroke-width="1"/>
-          <text x="230" y="238" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="7">🚻</text>
-          <text x="230" y="248" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="5">WC</text>
-
-          <!-- INFO TENT -->
-          <circle cx="150" cy="170" r="12" fill="#374151" stroke="#6b7280" stroke-width="1"/>
-          <text x="150" y="168" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="8" font-weight="700">i</text>
-          <text x="150" y="178" text-anchor="middle" fill="white" font-family="Sansation,sans-serif" font-size="5">INFO</text>
-
-          <!-- GPS location pulse -->
-          <circle cx="170" cy="190" r="10" fill="#247BA0" opacity=".2" class="location-pulse"/>
-          <circle cx="170" cy="190" r="5" fill="#247BA0"/>
-          <circle cx="170" cy="190" r="2.5" fill="white"/>
+          <circle cx="330" cy="310" r="18" fill="rgba(240,50,40,.1)" stroke="var(--accent)" stroke-width="1.5" onclick="openPopup('loc-ehbo')" style="cursor:pointer"/>
+          <text x="330" y="314" text-anchor="middle" font-size="11" fill="var(--accent)" font-weight="700">+</text>
+          <!-- Fiets parking -->
+          <rect x="40" y="80" width="70" height="50" rx="6" fill="rgba(36,123,160,.1)" stroke="var(--cerulean)" stroke-width="1"/>
+          <text x="75" y="107" text-anchor="middle" font-size="9" fill="var(--cerulean)">🚲 Fiets</text>
+          <!-- Auto parking -->
+          <rect x="300" y="80" width="60" height="50" rx="6" fill="rgba(36,123,160,.1)" stroke="var(--cerulean)" stroke-width="1"/>
+          <text x="330" y="107" text-anchor="middle" font-size="9" fill="var(--cerulean)">🅿 Auto</text>
+          <!-- title -->
+          <text x="200" y="420" text-anchor="middle" font-size="10" fill="var(--fg2)">Strijkviertel, Utrecht</text>
         </svg>
-
-        <div class="map-controls">
-          <div class="map-ctrl-btn" onclick="alert('GPS actief')">
-            <span class="material-icons-round" style="font-size:18px;color:var(--cerulean)">my_location</span>
-          </div>
-          <div class="map-ctrl-btn" onclick="alert('Zoom in')">
-            <span class="material-icons-round" style="font-size:18px">add</span>
-          </div>
-          <div class="map-ctrl-btn" onclick="alert('Zoom out')">
-            <span class="material-icons-round" style="font-size:18px">remove</span>
-          </div>
-        </div>
       </div>
-
       <div class="section-label" id="map-legend-label">Locaties</div>
       <div class="map-legend">
-        <div class="legend-item" onclick="openPopup('loc-main')">
-          <div class="legend-dot" style="background:#F03228"></div>
-          <div><div class="legend-item-label">Main Stage</div><div class="legend-item-sub">Noordzijde</div></div>
+        <div class="legend-item" onclick="openPopup('loc-poton')">
+          <div class="legend-dot" style="background:var(--accent)"></div>
+          <div><div class="legend-item-label">Poton</div><div class="legend-item-sub">Hoofdpodium</div></div>
         </div>
-        <div class="legend-item" onclick="openPopup('loc-cave')">
-          <div class="legend-dot" style="background:#247BA0"></div>
-          <div><div class="legend-item-label">Cave</div><div class="legend-item-sub">Westzijde</div></div>
+        <div class="legend-item" onclick="openPopup('loc-thelake')">
+          <div class="legend-dot" style="background:var(--cerulean)"></div>
+          <div><div class="legend-item-label">The Lake</div><div class="legend-item-sub">Talentpodium</div></div>
         </div>
-        <div class="legend-item" onclick="openPopup('loc-forest')">
-          <div class="legend-dot" style="background:#E3B505"></div>
-          <div><div class="legend-item-label">Forest Stage</div><div class="legend-item-sub">Oostzijde</div></div>
+        <div class="legend-item" onclick="openPopup('loc-theclub')">
+          <div class="legend-dot" style="background:var(--saffron)"></div>
+          <div><div class="legend-item-label">The Club</div><div class="legend-item-sub">Entertainment</div></div>
         </div>
-        <div class="legend-item" onclick="openPopup('loc-underground')">
-          <div class="legend-dot" style="background:#8B5CF6"></div>
-          <div><div class="legend-item-label">Underground</div><div class="legend-item-sub">Zuidzijde</div></div>
+        <div class="legend-item" onclick="openPopup('loc-hanggar')">
+          <div class="legend-dot" style="background:var(--purple)"></div>
+          <div><div class="legend-item-label">Hanggar</div><div class="legend-item-sub">DJ Stage</div></div>
         </div>
-        <div class="legend-item" onclick="openPopup('loc-food')">
-          <div class="legend-dot" style="background:#4a7c59"></div>
-          <div><div class="legend-item-label" id="leg-food">Food &amp; Bar</div><div class="legend-item-sub">Centrum</div></div>
+        <div class="legend-item" onclick="openPopup('loc-food')" id="leg-food-item">
+          <div class="legend-dot" style="background:var(--accent)"></div>
+          <div><div class="legend-item-label" id="leg-food">Food &amp; Bar</div><div class="legend-item-sub">Cashless</div></div>
         </div>
-        <div class="legend-item" onclick="openPopup('loc-ehbo')">
-          <div class="legend-dot" style="background:#dc2626"></div>
-          <div><div class="legend-item-label">EHBO</div><div class="legend-item-sub" id="leg-ehbo">Westzijde</div></div>
+        <div class="legend-item" onclick="openPopup('loc-ehbo')" id="leg-ehbo-item">
+          <div class="legend-dot" style="background:#22c55e"></div>
+          <div><div class="legend-item-label" id="leg-ehbo">Op het terrein</div><div class="legend-item-sub">EHBO</div></div>
         </div>
       </div>
-    </section>
-
+    </div>
   </div>
 
-  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-item active" id="nav-home" onclick="setScreen('home')">
       <span class="material-icons-round">home</span>
@@ -223,7 +166,7 @@
       <span class="nav-label" id="nav-info-label">Info</span>
     </button>
     <button class="nav-item" id="nav-schedule" onclick="setScreen('schedule')">
-      <span class="material-icons-round">grid_view</span>
+      <span class="material-icons-round">calendar_month</span>
       <span class="nav-label" id="nav-sched-label">Schema</span>
     </button>
     <button class="nav-item" id="nav-map" onclick="setScreen('map')">
@@ -233,15 +176,34 @@
   </nav>
 </div>
 
-<!-- POPUP OVERLAY -->
+<!-- ACT DETAIL FULL SCREEN -->
+<div class="act-detail-screen" id="act-detail-screen">
+  <div class="act-detail-topbar">
+    <button class="act-detail-back" onclick="closeActDetail()">
+      <span class="material-icons-round">arrow_back_ios</span>
+      <span>Festival</span>
+    </button>
+    <div class="act-detail-topbar-title">Festival</div>
+    <div style="width:80px;display:flex;justify-content:flex-end">
+      <button class="ctrl-btn" onclick="toggleLangFromDetail()" id="langBtnDetail">🇳🇱</button>
+    </div>
+  </div>
+  <div id="act-detail-content" style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- POPUP -->
 <div class="popup-overlay" id="popup-overlay" onclick="closePopup(event)">
-  <div class="popup-sheet" id="popup-sheet">
+  <div class="popup-sheet">
     <div class="popup-handle"></div>
-    <button class="popup-close" onclick="closePopup()"><span class="material-icons-round" style="font-size:16px">close</span></button>
+    <button class="popup-close" onclick="document.getElementById('popup-overlay').classList.remove('open')">
+      <span class="material-icons-round" style="font-size:18px">close</span>
+    </button>
     <div id="popup-inner"></div>
   </div>
 </div>
 
-<script src="JS/code.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
