@@ -1,4 +1,3 @@
-
 // ── TRANSLATIONS ──────────────────────────────────────────────────────
 const T = {
   nl: {
@@ -680,7 +679,7 @@ function scheduleNotifs() {
   const now = Date.now();
   [1,2].forEach(day => {
     (programme[day]||[]).forEach(item => {
-      if (!acts[item.act]) return; // only named acts
+      if (!acts[item.act]) return;
       [15,10,5].forEach(min => {
         const d = new Date('2025-09-' + (day===1?'06':'07') + 'T' + item.time + ':00');
         const when = d.getTime() - min*60000;
@@ -696,5 +695,298 @@ function scheduleNotifs() {
   });
 }
 
+// ── MAP ENGINE ────────────────────────────────────────────────────────
+// The SVG is 2330×1353. We display it at 700px wide → scale = 700/2330
+// Map canvas transform: translate(tx, ty) scale(s)
+const MAP_W = 700;        // initial display width of SVG image
+const MAP_RATIO = 1353/2330; // h/w of original SVG
+let mapS = 1;             // current zoom scale (1 = fit)
+let mapTx = 0;
+let mapTy = 0;
+let mapMinS = 0.5;
+let mapMaxS = 6;
+
+function getViewport() { return document.getElementById('map-viewport'); }
+function getCanvas()   { return document.getElementById('map-canvas'); }
+
+function applyMapTransform(animated) {
+  const c = getCanvas();
+  if (animated) c.style.transition = 'transform .25s ease';
+  else          c.style.transition = 'none';
+  c.style.transform = `translate(${mapTx}px,${mapTy}px) scale(${mapS})`;
+  c.style.transformOrigin = '0 0';
+  // Keep markers the same visual size by counter-scaling them
+  document.querySelectorAll('.map-marker').forEach(m => {
+    m.style.transform = `translate(-50%,-100%) scale(${1/mapS})`;
+  });
+  // User dot is different (centered on point, not pinned)
+  const ud = document.getElementById('user-loc-marker');
+  if (ud) ud.style.transform = `translate(-50%,-50%) scale(${1/mapS})`;
+}
+
+function clampMap() {
+  const vp = getViewport();
+  const vpW = vp.offsetWidth, vpH = vp.offsetHeight;
+  const cW = MAP_W * mapS, cH = MAP_W * MAP_RATIO * mapS;
+  // Allow some overdrag (20% of canvas)
+  const pad = 60;
+  mapTx = Math.min(pad, Math.max(vpW - cW - pad, mapTx));
+  mapTy = Math.min(pad, Math.max(vpH - cH - pad, mapTy));
+}
+
+function mapFitToViewport() {
+  const vp = getViewport();
+  if (!vp) return;
+  const vpW = vp.offsetWidth, vpH = vp.offsetHeight;
+  const fitW = vpW / MAP_W;
+  const fitH = vpH / (MAP_W * MAP_RATIO);
+  mapS = Math.min(fitW, fitH);
+  mapTx = (vpW - MAP_W * mapS) / 2;
+  mapTy = (vpH - MAP_W * MAP_RATIO * mapS) / 2;
+}
+
+function mapReset() {
+  mapFitToViewport();
+  applyMapTransform(true);
+}
+
+function mapZoom(factor, cx, cy) {
+  const vp = getViewport();
+  if (!cx) cx = vp.offsetWidth / 2;
+  if (!cy) cy = vp.offsetHeight / 2;
+  const newS = Math.max(mapMinS, Math.min(mapMaxS, mapS * factor));
+  const sf = newS / mapS;
+  mapTx = cx - sf * (cx - mapTx);
+  mapTy = cy - sf * (cy - mapTy);
+  mapS = newS;
+  clampMap();
+  applyMapTransform(true);
+}
+
+function initMapInteraction() {
+  const vp = getViewport();
+  if (!vp) return;
+
+  // Initial fit
+  mapFitToViewport();
+  applyMapTransform(false);
+
+  // ── DRAG ──
+  let isDragging = false;
+  let dragStartX, dragStartY, dragStartTx, dragStartTy;
+
+  vp.addEventListener('pointerdown', e => {
+    if (e.touches && e.touches.length > 1) return;
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    dragStartTx = mapTx;
+    dragStartTy = mapTy;
+    vp.setPointerCapture(e.pointerId);
+    getCanvas().style.transition = 'none';
+  });
+
+  vp.addEventListener('pointermove', e => {
+    if (!isDragging) return;
+    mapTx = dragStartTx + (e.clientX - dragStartX);
+    mapTy = dragStartTy + (e.clientY - dragStartY);
+    clampMap();
+    applyMapTransform(false);
+  });
+
+  vp.addEventListener('pointerup',   () => { isDragging = false; });
+  vp.addEventListener('pointercancel',()=> { isDragging = false; });
+
+  // ── PINCH ZOOM ──
+  let lastPinchDist = null;
+  let pinchCx = 0, pinchCy = 0;
+
+  vp.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+      isDragging = false;
+      const t = e.touches;
+      lastPinchDist = Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
+      const rect = vp.getBoundingClientRect();
+      pinchCx = (t[0].clientX + t[1].clientX)/2 - rect.left;
+      pinchCy = (t[0].clientY + t[1].clientY)/2 - rect.top;
+    }
+  }, { passive: true });
+
+  vp.addEventListener('touchmove', e => {
+    if (e.touches.length !== 2 || lastPinchDist === null) return;
+    e.preventDefault();
+    const t = e.touches;
+    const dist = Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
+    const factor = dist / lastPinchDist;
+    lastPinchDist = dist;
+    const newS = Math.max(mapMinS, Math.min(mapMaxS, mapS * factor));
+    const sf = newS / mapS;
+    mapTx = pinchCx - sf * (pinchCx - mapTx);
+    mapTy = pinchCy - sf * (pinchCy - mapTy);
+    mapS = newS;
+    clampMap();
+    applyMapTransform(false);
+  }, { passive: false });
+
+  vp.addEventListener('touchend', e => {
+    if (e.touches.length < 2) lastPinchDist = null;
+  });
+
+  // ── MOUSE WHEEL ZOOM ──
+  vp.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = vp.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+    const factor = e.deltaY < 0 ? 1.15 : 0.87;
+    mapZoom(factor, cx, cy);
+  }, { passive: false });
+
+  // Re-fit on resize
+  window.addEventListener('resize', () => {
+    if (currentScreen === 'map') mapReset();
+  });
+}
+
+// Call initMapInteraction when map screen becomes visible
+const _origSetScreen = setScreen;
+// (override below after setScreen defined — handled in init)
+
+// ── STAGE POPUP: LIVE INFO ────────────────────────────────────────────
+const stageInfo = {
+  poton:   { nl: { name:'Ponton',    sub:'Hoofdpodium — grote acts' },    en: { name:'Ponton',    sub:'Main stage — headline acts' } },
+  thelake: { nl: { name:'The Lake',  sub:'Talentpodium — nieuw talent' }, en: { name:'The Lake',  sub:'Talent stage — emerging artists' } },
+  theclub: { nl: { name:'The Club',  sub:'Theater & Stand-up comedy' },   en: { name:'The Club',  sub:'Theatre & stand-up comedy' } },
+  hanggar: { nl: { name:'Hangar',    sub:'Non-stop house / techno / dance' }, en: { name:'Hangar', sub:'Non-stop house / techno / dance' } },
+};
+const stageColor = { poton:'#F03228', thelake:'#247BA0', theclub:'#E3B505', hanggar:'#8B5CF6' };
+const stageNum   = { poton:1, thelake:2, theclub:3, hanggar:4 };
+
+function getActsForStage(stageId) {
+  // Combine both days, both programme days
+  const all = [];
+  [1,2].forEach(d => (programme[d]||[]).filter(i=>i.stage===stageId).forEach(i=>all.push({...i,day:d})));
+  return all;
+}
+
+function getNowAndNext(stageId) {
+  // Simulate "now" — use a fixed demo time (festival day) or real clock
+  // For demo: use actual time of day to pick acts on day 1
+  const now = new Date();
+  const nowMins = now.getHours()*60 + now.getMinutes();
+  const dayItems = (programme[currentDay]||[]).filter(i=>i.stage===stageId);
+
+  let current = null, next = null;
+  for (const item of dayItems) {
+    const start = toMins(item.time);
+    const end = start + item.dur;
+    if (nowMins >= start && nowMins < end) { current = item; }
+    else if (nowMins < start && !next) { next = item; }
+  }
+  return { current, next };
+}
+
+function openStagePopup(stageId) {
+  const info = stageInfo[stageId][lang];
+  const color = stageColor[stageId];
+  const num = stageNum[stageId];
+  const { current, next } = getNowAndNext(stageId);
+  const allActs = (programme[currentDay]||[]).filter(i=>i.stage===stageId);
+
+  const nowLabel  = lang==='nl' ? 'Nu op het podium' : 'Now on stage';
+  const nextLabel = lang==='nl' ? 'Volgende act' : 'Next up';
+  const todayLabel= lang==='nl' ? `Programma Dag ${currentDay}` : `Day ${currentDay} programme`;
+  const nothingLabel = lang==='nl' ? 'Geen optreden op dit moment' : 'No performance right now';
+
+  const currentBlock = current
+    ? `<div class="stage-popup-now">
+        <div class="stage-popup-label">${nowLabel}</div>
+        <div class="stage-popup-act">${getActInfo(current.act).name}</div>
+        <div class="stage-popup-time">${current.time} – ${fromMins(toMins(current.time)+current.dur)}</div>
+       </div>`
+    : `<div class="stage-popup-next"><div class="stage-popup-label">${nowLabel}</div><div style="color:var(--fg2);font-size:14px">${nothingLabel}</div></div>`;
+
+  const nextBlock = next
+    ? `<div class="stage-popup-next">
+        <div class="stage-popup-label">${nextLabel}</div>
+        <div class="stage-popup-act">${getActInfo(next.act).name}</div>
+        <div class="stage-popup-time">${next.time} – ${fromMins(toMins(next.time)+next.dur)}</div>
+       </div>`
+    : '';
+
+  const scheduleRows = allActs.map(item => {
+    const ai = getActInfo(item.act);
+    const isNow = current && current.act === item.act;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);${isNow?'font-weight:700;color:'+color:''}">
+      <span style="font-size:12px;color:var(--fg2);width:40px;flex-shrink:0">${item.time}</span>
+      <span style="font-size:13px;flex:1">${ai.name}</span>
+      <span style="font-size:10px;color:var(--fg2)">${item.dur}m</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('popup-inner').innerHTML = `
+    <div class="popup-tag" style="color:${color}">Locatie ${num}</div>
+    <div class="popup-title">${info.name}</div>
+    <div class="popup-sub">${info.sub}</div>
+    <div class="popup-body">
+      ${currentBlock}
+      ${nextBlock}
+      <div style="margin-top:16px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--fg2);margin-bottom:8px">${todayLabel}</div>
+        ${scheduleRows || `<div style="color:var(--fg2);font-size:13px;font-style:italic">${lang==='nl'?'Geen programma beschikbaar.':'No schedule available.'}</div>`}
+      </div>
+    </div>`;
+  document.getElementById('popup-overlay').classList.add('open');
+}
+
+// ── USER LOCATION ─────────────────────────────────────────────────────
+// Festival GPS bounds (approximate Strijkviertel, Utrecht)
+const FEST_BOUNDS = {
+  lat_min: 52.068, lat_max: 52.076,
+  lng_min: 5.053,  lng_max: 5.075
+};
+
+function locateUser() {
+  const btn = document.getElementById('locate-btn');
+  if (!('geolocation' in navigator)) {
+    alert(lang==='nl'?'GPS niet beschikbaar.':'GPS not available.'); return;
+  }
+  btn.style.color = 'var(--accent)';
+  navigator.geolocation.getCurrentPosition(pos => {
+    btn.style.color = '';
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    // Map lat/lng to % position on SVG
+    const xPct = (lng - FEST_BOUNDS.lng_min) / (FEST_BOUNDS.lng_max - FEST_BOUNDS.lng_min) * 100;
+    const yPct = (1 - (lat - FEST_BOUNDS.lat_min) / (FEST_BOUNDS.lat_max - FEST_BOUNDS.lat_min)) * 100;
+    const marker = document.getElementById('user-loc-marker');
+    if (marker) {
+      marker.style.display = 'block';
+      marker.style.left = xPct + '%';
+      marker.style.top  = yPct + '%';
+    }
+  }, () => {
+    btn.style.color = '';
+    alert(lang==='nl'?'Locatie niet beschikbaar. Controleer je GPS-instellingen.':'Location not available. Check your GPS settings.');
+  }, { enableHighAccuracy: true, timeout: 8000 });
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────
 renderAccordion();
+renderSchedule();
+
+// Init map when DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+  initMapInteraction();
+});
+// Also init if map screen is shown before DOMContentLoaded resolves
+if (document.readyState !== 'loading') {
+  setTimeout(initMapInteraction, 50);
+}
+
+// Re-init map fit when switching to map tab
+const _setScreenOrig = setScreen;
+window.setScreen = function(name) {
+  _setScreenOrig(name);
+  if (name === 'map') setTimeout(mapReset, 60);
+};

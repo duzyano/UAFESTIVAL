@@ -1,10 +1,10 @@
-<?php // U Festival App ?>
+<?php // ❤️U Festival App ?>
 <!DOCTYPE html>
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>U Festival</title>
+<title>❤️U Festival</title>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -85,72 +85,92 @@
 
     <!-- MAP -->
     <div class="screen" id="screen-map">
-      <div class="section-label" id="map-label">Festivalkaart</div>
-      <div class="map-container">
-        <svg class="map-svg" viewBox="0 0 400 440" xmlns="http://www.w3.org/2000/svg">
-          <rect width="400" height="440" fill="var(--bg2)"/>
-          <!-- terrain outline -->
-          <path d="M30 60 L370 60 L370 380 L30 380 Z" fill="none" stroke="var(--border)" stroke-width="2" stroke-dasharray="8,4"/>
-          <!-- Main entrance -->
-          <rect x="160" y="360" width="80" height="20" rx="4" fill="var(--cerulean)" opacity=".3"/>
-          <text x="200" y="374" text-anchor="middle" font-size="9" fill="var(--cerulean)" font-weight="700">INGANG</text>
-          <!-- Poton stage -->
-          <rect x="140" y="80" width="120" height="70" rx="8" fill="rgba(240,50,40,.2)" stroke="var(--accent)" stroke-width="1.5"/>
-          <text x="200" y="118" text-anchor="middle" font-size="11" fill="var(--accent)" font-weight="700">POTON</text>
-          <text x="200" y="132" text-anchor="middle" font-size="9" fill="var(--fg2)">Hoofdpodium</text>
-          <!-- The Lake -->
-          <rect x="40" y="180" width="100" height="60" rx="8" fill="rgba(36,123,160,.2)" stroke="var(--cerulean)" stroke-width="1.5"/>
-          <text x="90" y="213" text-anchor="middle" font-size="10" fill="var(--cerulean)" font-weight="700">THE LAKE</text>
-          <text x="90" y="227" text-anchor="middle" font-size="9" fill="var(--fg2)">Talentpodium</text>
-          <!-- The Club -->
-          <rect x="260" y="180" width="100" height="60" rx="8" fill="rgba(227,181,5,.2)" stroke="var(--saffron)" stroke-width="1.5"/>
-          <text x="310" y="213" text-anchor="middle" font-size="10" fill="var(--saffron)" font-weight="700">THE CLUB</text>
-          <text x="310" y="227" text-anchor="middle" font-size="9" fill="var(--fg2)">Entertainment</text>
-          <!-- Hanggar -->
-          <rect x="140" y="270" width="120" height="60" rx="8" fill="rgba(139,92,246,.2)" stroke="var(--purple)" stroke-width="1.5"/>
-          <text x="200" y="303" text-anchor="middle" font-size="10" fill="var(--purple)" font-weight="700">HANGGAR</text>
-          <text x="200" y="317" text-anchor="middle" font-size="9" fill="var(--fg2)">DJ stage</text>
-          <!-- Food -->
-          <circle cx="80" cy="310" r="18" fill="rgba(240,50,40,.1)" stroke="var(--accent)" stroke-width="1.5" onclick="openPopup('loc-food')" style="cursor:pointer"/>
-          <text x="80" y="314" text-anchor="middle" font-size="9" fill="var(--accent)" font-weight="700">🍺</text>
-          <!-- EHBO -->
-          <circle cx="330" cy="310" r="18" fill="rgba(240,50,40,.1)" stroke="var(--accent)" stroke-width="1.5" onclick="openPopup('loc-ehbo')" style="cursor:pointer"/>
-          <text x="330" y="314" text-anchor="middle" font-size="11" fill="var(--accent)" font-weight="700">+</text>
-          <!-- Fiets parking -->
-          <rect x="40" y="80" width="70" height="50" rx="6" fill="rgba(36,123,160,.1)" stroke="var(--cerulean)" stroke-width="1"/>
-          <text x="75" y="107" text-anchor="middle" font-size="9" fill="var(--cerulean)">🚲 Fiets</text>
-          <!-- Auto parking -->
-          <rect x="300" y="80" width="60" height="50" rx="6" fill="rgba(36,123,160,.1)" stroke="var(--cerulean)" stroke-width="1"/>
-          <text x="330" y="107" text-anchor="middle" font-size="9" fill="var(--cerulean)">🅿 Auto</text>
-          <!-- title -->
-          <text x="200" y="420" text-anchor="middle" font-size="10" fill="var(--fg2)">Strijkviertel, Utrecht</text>
-        </svg>
+      <div id="map-topbar">
+        <div class="section-label" id="map-label" style="margin:0">Festivalkaart</div>
       </div>
-      <div class="section-label" id="map-legend-label">Locaties</div>
-      <div class="map-legend">
-        <div class="legend-item" onclick="openPopup('loc-poton')">
-          <div class="legend-dot" style="background:var(--accent)"></div>
-          <div><div class="legend-item-label">Poton</div><div class="legend-item-sub">Hoofdpodium</div></div>
+
+      <div id="map-viewport">
+        <div id="map-canvas">
+          <div id="map-svg-wrap">
+            <!-- Real festival SVG embedded — loads from file, fallback to img -->
+            <img src="assets/kaart_festival_markers.svg" alt="Festivalkaart"
+                 style="width:700px;height:auto;display:block" draggable="false"
+                 id="map-img">
+          </div>
+
+          <!-- Stage markers corrected to SVG 2330x1353 positions -->
+          <!-- Ponton(1):  rode gebouw links cx≈310,cy≈870  → 13.3%, 64.3% -->
+          <!-- The Lake(2):waterrand links   cx≈680,cy≈700  → 29.2%, 51.7% -->
+          <!-- The Club(3):pier midden       cx≈1020,cy≈660 → 43.8%, 48.8% -->
+          <!-- Hangar(4):  loods rechts      cx≈1890,cy≈310 → 81.1%, 22.9% -->
+          <div class="map-marker m-1" style="left:13.3%;top:64.3%" onclick="openStagePopup('poton')">
+            <div class="marker-pin">
+              <div class="marker-circle">1</div>
+              <div class="marker-tail"></div>
+            </div>
+          </div>
+          <div class="map-marker m-2" style="left:29.2%;top:51.7%" onclick="openStagePopup('thelake')">
+            <div class="marker-pin">
+              <div class="marker-circle">2</div>
+              <div class="marker-tail"></div>
+            </div>
+          </div>
+          <div class="map-marker m-3" style="left:43.8%;top:48.8%" onclick="openStagePopup('theclub')">
+            <div class="marker-pin">
+              <div class="marker-circle">3</div>
+              <div class="marker-tail"></div>
+            </div>
+          </div>
+          <div class="map-marker m-4" style="left:81.1%;top:22.9%" onclick="openStagePopup('hanggar')">
+            <div class="marker-pin">
+              <div class="marker-circle">4</div>
+              <div class="marker-tail"></div>
+            </div>
+          </div>
+
+          <!-- User location dot (hidden until GPS acquired) -->
+          <div class="map-marker" id="user-loc-marker" style="display:none;left:50%;top:50%">
+            <div class="user-dot"></div>
+          </div>
         </div>
-        <div class="legend-item" onclick="openPopup('loc-thelake')">
-          <div class="legend-dot" style="background:var(--cerulean)"></div>
-          <div><div class="legend-item-label">The Lake</div><div class="legend-item-sub">Talentpodium</div></div>
+
+        <!-- Zoom / locate buttons -->
+        <div id="map-controls">
+          <button class="map-ctrl-btn" onclick="mapZoom(1.3)" title="Inzoomen">
+            <span class="material-icons-round" style="font-size:20px">add</span>
+          </button>
+          <button class="map-ctrl-btn" onclick="mapZoom(0.77)" title="Uitzoomen">
+            <span class="material-icons-round" style="font-size:20px">remove</span>
+          </button>
+          <button class="map-ctrl-btn" onclick="mapReset()" title="Alles zichtbaar">
+            <span class="material-icons-round" style="font-size:20px">fit_screen</span>
+          </button>
+          <button class="map-ctrl-btn" onclick="locateUser()" title="Mijn locatie" id="locate-btn">
+            <span class="material-icons-round" style="font-size:20px">my_location</span>
+          </button>
         </div>
-        <div class="legend-item" onclick="openPopup('loc-theclub')">
-          <div class="legend-dot" style="background:var(--saffron)"></div>
-          <div><div class="legend-item-label">The Club</div><div class="legend-item-sub">Entertainment</div></div>
-        </div>
-        <div class="legend-item" onclick="openPopup('loc-hanggar')">
-          <div class="legend-dot" style="background:var(--purple)"></div>
-          <div><div class="legend-item-label">Hanggar</div><div class="legend-item-sub">DJ Stage</div></div>
-        </div>
-        <div class="legend-item" onclick="openPopup('loc-food')" id="leg-food-item">
-          <div class="legend-dot" style="background:var(--accent)"></div>
-          <div><div class="legend-item-label" id="leg-food">Food &amp; Bar</div><div class="legend-item-sub">Cashless</div></div>
-        </div>
-        <div class="legend-item" onclick="openPopup('loc-ehbo')" id="leg-ehbo-item">
-          <div class="legend-dot" style="background:#22c55e"></div>
-          <div><div class="legend-item-label" id="leg-ehbo">Op het terrein</div><div class="legend-item-sub">EHBO</div></div>
+      </div>
+
+      <!-- Legend -->
+      <div id="map-legend-wrap">
+        <div class="section-label" id="map-legend-label" style="margin-bottom:8px">Locaties</div>
+        <div class="map-legend">
+          <div class="legend-item" onclick="openStagePopup('poton')">
+            <div class="legend-dot" style="background:#F03228"></div>
+            <div><div class="legend-item-label">1 · Ponton</div><div class="legend-item-sub" id="leg-1-sub">Hoofdpodium</div></div>
+          </div>
+          <div class="legend-item" onclick="openStagePopup('thelake')">
+            <div class="legend-dot" style="background:#F03228"></div>
+            <div><div class="legend-item-label">2 · The Lake</div><div class="legend-item-sub" id="leg-2-sub">Talent</div></div>
+          </div>
+          <div class="legend-item" onclick="openStagePopup('theclub')">
+            <div class="legend-dot" style="background:#F03228"></div>
+            <div><div class="legend-item-label">3 · The Club</div><div class="legend-item-sub" id="leg-3-sub">Theater &amp; Comedy</div></div>
+          </div>
+          <div class="legend-item" onclick="openStagePopup('hanggar')">
+            <div class="legend-dot" style="background:#F03228"></div>
+            <div><div class="legend-item-label">4 · Hangar</div><div class="legend-item-sub" id="leg-4-sub">House / Techno</div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -203,7 +223,6 @@
     <div id="popup-inner"></div>
   </div>
 </div>
-
 <script src="app.js"></script>
 </body>
 </html>
