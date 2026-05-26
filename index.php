@@ -98,12 +98,7 @@
                  id="map-img">
           </div>
 
-          <!-- Stage markers corrected to SVG 2330x1353 positions -->
-          <!-- Ponton(1):  rode gebouw links cx≈310,cy≈870  → 13.3%, 64.3% -->
-          <!-- The Lake(2):waterrand links   cx≈680,cy≈700  → 29.2%, 51.7% -->
-          <!-- The Club(3):pier midden       cx≈1020,cy≈660 → 43.8%, 48.8% -->
-          <!-- Hangar(4):  loods rechts      cx≈1890,cy≈310 → 81.1%, 22.9% -->
-          <div class="map-marker m-1" style="left:13.3%;top:64.3%" onclick="openStagePopup('poton')">
+          <div class="map-marker m-1" style="left:20.9%;top:63.3%" onclick="openStagePopup('poton')">
             <div class="marker-pin">
               <div class="marker-circle">1</div>
               <div class="marker-tail"></div>
