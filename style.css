@@ -715,10 +715,9 @@
  #map-svg-wrap {
    display: block;
    width: 700px;
-   /* display width; height auto from viewBox ratio */
  }
 
- #map-svg-wrap svg {
+ #map-svg-wrap img {
    display: block;
    width: 700px;
    height: auto;
@@ -730,7 +729,7 @@
    transform: translate(-50%, -100%);
    pointer-events: all;
    cursor: pointer;
-   z-index: 10;
+   z-index: 20;
  }
 
  .marker-pin {
@@ -850,55 +849,6 @@
 
  .map-ctrl-btn:active {
    transform: scale(.9);
- }
-
- /* Legend below map */
- #map-legend-wrap {
-   flex-shrink: 0;
-   padding: 10px 16px;
-   padding-bottom: calc(var(--nav-h) + var(--safe-b) + 10px);
-   background: var(--bg);
-   border-top: 1px solid var(--border);
-   overflow-y: auto;
- }
-
- .map-legend {
-   display: grid;
-   grid-template-columns: 1fr 1fr;
-   gap: 8px;
- }
-
- .legend-item {
-   display: flex;
-   align-items: center;
-   gap: 8px;
-   background: var(--card);
-   border: 1px solid var(--border);
-   border-radius: var(--radius);
-   padding: 10px 12px;
-   cursor: pointer;
-   transition: all .15s;
- }
-
- .legend-item:active {
-   transform: scale(.97);
- }
-
- .legend-dot {
-   width: 12px;
-   height: 12px;
-   border-radius: 50%;
-   flex-shrink: 0;
- }
-
- .legend-item-label {
-   font-size: 12px;
-   font-weight: 700;
- }
-
- .legend-item-sub {
-   font-size: 10px;
-   color: var(--fg2);
  }
 
  /* Stage popup live info */

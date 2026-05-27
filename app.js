@@ -387,9 +387,6 @@ function applyTranslations() {
   document.getElementById('day2-btn').innerHTML = tv.day2 + '<span>' + tv.day2s + '</span>';
   document.getElementById('tab-all').textContent = tv.tabAll;
   document.getElementById('map-label').textContent = tv.mapLabel;
-  document.getElementById('map-legend-label').textContent = tv.mapLeg;
-  document.getElementById('leg-food').textContent = tv.legFood;
-  document.getElementById('leg-ehbo').textContent = tv.legEhbo;
   document.getElementById('nav-home-label').textContent = tv.navHome;
   document.getElementById('nav-info-label').textContent = tv.navInfo;
   document.getElementById('nav-sched-label').textContent = tv.navSched;
@@ -773,11 +770,14 @@ function initMapInteraction() {
 
   // ── DRAG ──
   let isDragging = false;
+  let dragMoved = false;
   let dragStartX, dragStartY, dragStartTx, dragStartTy;
 
   vp.addEventListener('pointerdown', e => {
+    if (e.target.closest('.map-marker')) return; // let marker handle its own click
     if (e.touches && e.touches.length > 1) return;
     isDragging = true;
+    dragMoved = false;
     dragStartX = e.clientX;
     dragStartY = e.clientY;
     dragStartTx = mapTx;
@@ -788,14 +788,17 @@ function initMapInteraction() {
 
   vp.addEventListener('pointermove', e => {
     if (!isDragging) return;
-    mapTx = dragStartTx + (e.clientX - dragStartX);
-    mapTy = dragStartTy + (e.clientY - dragStartY);
+    const dx = e.clientX - dragStartX;
+    const dy = e.clientY - dragStartY;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) dragMoved = true;
+    mapTx = dragStartTx + dx;
+    mapTy = dragStartTy + dy;
     clampMap();
     applyMapTransform(false);
   });
 
-  vp.addEventListener('pointerup',   () => { isDragging = false; });
-  vp.addEventListener('pointercancel',()=> { isDragging = false; });
+  vp.addEventListener('pointerup', () => { isDragging = false; dragMoved = false; });
+  vp.addEventListener('pointercancel', () => { isDragging = false; dragMoved = false; });
 
   // ── PINCH ZOOM ──
   let lastPinchDist = null;

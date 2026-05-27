@@ -94,17 +94,18 @@
           <div id="map-svg-wrap">
             <!-- Real festival SVG embedded — loads from file, fallback to img -->
             <img src="assets/kaart_festival_markers.svg" alt="Festivalkaart"
-                 style="width:700px;height:auto;display:block" draggable="false"
+                 style="width:700px;height:auto;display:block;pointer-events:none;" draggable="false"
                  id="map-img">
           </div>
 
-          <div class="map-marker m-1" style="left:20.9%;top:63.3%" onclick="openStagePopup('poton')">
+         
+          <div class="map-marker m-1" style="left:21.3%;top:61.3%" onclick="openStagePopup('poton')">
             <div class="marker-pin">
               <div class="marker-circle">1</div>
               <div class="marker-tail"></div>
             </div>
           </div>
-          <div class="map-marker m-2" style="left:29.2%;top:51.7%" onclick="openStagePopup('thelake')">
+          <div class="map-marker m-2" style="left:54.2%;top:46.7%" onclick="openStagePopup('thelake')">
             <div class="marker-pin">
               <div class="marker-circle">2</div>
               <div class="marker-tail"></div>
@@ -143,29 +144,6 @@
           <button class="map-ctrl-btn" onclick="locateUser()" title="Mijn locatie" id="locate-btn">
             <span class="material-icons-round" style="font-size:20px">my_location</span>
           </button>
-        </div>
-      </div>
-
-      <!-- Legend -->
-      <div id="map-legend-wrap">
-        <div class="section-label" id="map-legend-label" style="margin-bottom:8px">Locaties</div>
-        <div class="map-legend">
-          <div class="legend-item" onclick="openStagePopup('poton')">
-            <div class="legend-dot" style="background:#F03228"></div>
-            <div><div class="legend-item-label">1 · Ponton</div><div class="legend-item-sub" id="leg-1-sub">Hoofdpodium</div></div>
-          </div>
-          <div class="legend-item" onclick="openStagePopup('thelake')">
-            <div class="legend-dot" style="background:#F03228"></div>
-            <div><div class="legend-item-label">2 · The Lake</div><div class="legend-item-sub" id="leg-2-sub">Talent</div></div>
-          </div>
-          <div class="legend-item" onclick="openStagePopup('theclub')">
-            <div class="legend-dot" style="background:#F03228"></div>
-            <div><div class="legend-item-label">3 · The Club</div><div class="legend-item-sub" id="leg-3-sub">Theater &amp; Comedy</div></div>
-          </div>
-          <div class="legend-item" onclick="openStagePopup('hanggar')">
-            <div class="legend-dot" style="background:#F03228"></div>
-            <div><div class="legend-item-label">4 · Hangar</div><div class="legend-item-sub" id="leg-4-sub">House / Techno</div></div>
-          </div>
         </div>
       </div>
     </div>
@@ -218,6 +196,7 @@
     <div id="popup-inner"></div>
   </div>
 </div>
+
 <script src="app.js"></script>
 </body>
 </html>
