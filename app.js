@@ -706,17 +706,20 @@ let mapMaxS = 6;
 function getViewport() { return document.getElementById('map-viewport'); }
 function getCanvas()   { return document.getElementById('map-canvas'); }
 
+const SVG_SCALE = 700 / 2330;
+const STAGE_CIRCLES = {
+  poton:   { cx: 496.9,   cy: 849.15 },
+  thelake: { cx: 1256.98, cy: 615.25 },
+  theclub: { cx: 2102.13, cy: 231.18 },
+  hanggar: { cx: 1614.31, cy: 528.68 },
+};
+
 function applyMapTransform(animated) {
   const c = getCanvas();
   if (animated) c.style.transition = 'transform .25s ease';
   else          c.style.transition = 'none';
   c.style.transform = `translate(${mapTx}px,${mapTy}px) scale(${mapS})`;
   c.style.transformOrigin = '0 0';
-  // Keep markers the same visual size by counter-scaling them
-  document.querySelectorAll('.map-marker').forEach(m => {
-    m.style.transform = `translate(-50%,-100%) scale(${1/mapS})`;
-  });
-  // User dot is different (centered on point, not pinned)
   const ud = document.getElementById('user-loc-marker');
   if (ud) ud.style.transform = `translate(-50%,-50%) scale(${1/mapS})`;
 }
@@ -764,25 +767,40 @@ function initMapInteraction() {
   const vp = getViewport();
   if (!vp) return;
 
-  // Initial fit
   mapFitToViewport();
   applyMapTransform(false);
 
-  // ── DRAG ──
   let isDragging = false;
-  let dragMoved = false;
+  let dragMoved  = false;
   let dragStartX, dragStartY, dragStartTx, dragStartTy;
+  let tapStage = null; // which stage circle was tapped
+
+  // Check if a screen point (relative to viewport) hits a stage circle
+  function hitStage(screenX, screenY) {
+    const rect = vp.getBoundingClientRect();
+    const x = screenX - rect.left;
+    const y = screenY - rect.top;
+    for (const [stage, {cx, cy}] of Object.entries(STAGE_CIRCLES)) {
+      // Convert SVG coords to current screen coords
+      const sx = cx * SVG_SCALE * mapS + mapTx;
+      const sy = cy * SVG_SCALE * mapS + mapTy;
+      const dist = Math.hypot(x - sx, y - sy);
+      const hitR = 35 * SVG_SCALE * mapS + 12; // circle radius + touch tolerance
+      if (dist <= hitR) return stage;
+    }
+    return null;
+  }
 
   vp.addEventListener('pointerdown', e => {
-    if (e.target.closest('.map-marker')) return; // let marker handle its own click
-    if (e.touches && e.touches.length > 1) return;
+    if (e.pointerType === 'touch' && e.touches && e.touches.length > 1) return;
+    dragMoved  = false;
     isDragging = true;
-    dragMoved = false;
+    tapStage   = hitStage(e.clientX, e.clientY);
     dragStartX = e.clientX;
     dragStartY = e.clientY;
     dragStartTx = mapTx;
     dragStartTy = mapTy;
-    vp.setPointerCapture(e.pointerId);
+    // NO setPointerCapture — that was blocking clicks
     getCanvas().style.transition = 'none';
   });
 
@@ -790,15 +808,31 @@ function initMapInteraction() {
     if (!isDragging) return;
     const dx = e.clientX - dragStartX;
     const dy = e.clientY - dragStartY;
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) dragMoved = true;
+    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+      dragMoved = true;
+      tapStage  = null;
+    }
     mapTx = dragStartTx + dx;
     mapTy = dragStartTy + dy;
     clampMap();
     applyMapTransform(false);
   });
 
-  vp.addEventListener('pointerup', () => { isDragging = false; dragMoved = false; });
-  vp.addEventListener('pointercancel', () => { isDragging = false; dragMoved = false; });
+  vp.addEventListener('pointerup', e => {
+    if (!dragMoved && tapStage) {
+      // It was a tap on a stage circle
+      openStagePopup(tapStage);
+    }
+    isDragging = false;
+    dragMoved  = false;
+    tapStage   = null;
+  });
+
+  vp.addEventListener('pointercancel', () => {
+    isDragging = false;
+    dragMoved  = false;
+    tapStage   = null;
+  });
 
   // ── PINCH ZOOM ──
   let lastPinchDist = null;
@@ -845,7 +879,6 @@ function initMapInteraction() {
     mapZoom(factor, cx, cy);
   }, { passive: false });
 
-  // Re-fit on resize
   window.addEventListener('resize', () => {
     if (currentScreen === 'map') mapReset();
   });
@@ -982,9 +1015,8 @@ renderSchedule();
 document.addEventListener('DOMContentLoaded', () => {
   initMapInteraction();
 });
-// Also init if map screen is shown before DOMContentLoaded resolves
 if (document.readyState !== 'loading') {
-  setTimeout(initMapInteraction, 50);
+  setTimeout(() => { initMapInteraction(); }, 50);
 }
 
 // Re-init map fit when switching to map tab
