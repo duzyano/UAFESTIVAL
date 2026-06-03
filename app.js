@@ -1,3 +1,4 @@
+
 // ── TRANSLATIONS ──────────────────────────────────────────────────────
 const T = {
   nl: {
@@ -492,7 +493,8 @@ function renderSchedule() {
   stages.forEach(stage => {
     const rowItems = filtered.filter(i => i.stage === stage);
     html += `<div style="display:flex;margin-bottom:8px;align-items:flex-start">`;
-    html += `<div style="width:${NAME_W}px;flex-shrink:0;font-size:10px;font-weight:700;color:var(--fg2);text-transform:uppercase;letter-spacing:.5px;padding-top:${STAGE_H/2-8}px;padding-right:6px;line-height:1.2">${STAGE_LABELS[stage]}</div>`;
+    const stageLabelColor = theme === 'dark' ? '#5b9fd4' : '#0a2a4a';
+    html += `<div style="width:${NAME_W}px;flex-shrink:0;font-size:10px;font-weight:700;color:${stageLabelColor};text-transform:uppercase;letter-spacing:.5px;padding-top:${STAGE_H/2-8}px;padding-right:6px;line-height:1.2">${STAGE_LABELS[stage]}</div>`;
     html += `<div style="position:relative;width:${totalWidth}px;height:${STAGE_H}px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);flex-shrink:0;overflow:hidden">`;
     // grid lines
     timeMarks.forEach(m => {
@@ -976,35 +978,59 @@ function openStagePopup(stageId) {
 }
 
 // ── USER LOCATION ─────────────────────────────────────────────────────
-// Festival GPS bounds (approximate Strijkviertel, Utrecht)
-const FEST_BOUNDS = {
-  lat_min: 52.068, lat_max: 52.076,
-  lng_min: 5.053,  lng_max: 5.075
-};
-
 function locateUser() {
   const btn = document.getElementById('locate-btn');
   if (!('geolocation' in navigator)) {
-    alert(lang==='nl'?'GPS niet beschikbaar.':'GPS not available.'); return;
+    alert(lang==='nl'?'GPS niet beschikbaar in deze browser.':'GPS not available in this browser.'); return;
   }
   btn.style.color = 'var(--accent)';
   navigator.geolocation.getCurrentPosition(pos => {
     btn.style.color = '';
     const lat = pos.coords.latitude;
     const lng = pos.coords.longitude;
-    // Map lat/lng to % position on SVG
-    const xPct = (lng - FEST_BOUNDS.lng_min) / (FEST_BOUNDS.lng_max - FEST_BOUNDS.lng_min) * 100;
-    const yPct = (1 - (lat - FEST_BOUNDS.lat_min) / (FEST_BOUNDS.lat_max - FEST_BOUNDS.lat_min)) * 100;
+
+    // Map lat/lng to % position on SVG canvas
+    // Festival bounds (Strijkviertel Utrecht)
+    const LAT_MIN = 52.068, LAT_MAX = 52.076;
+    const LNG_MIN = 5.053,  LNG_MAX = 5.075;
+
+    let xPct = (lng - LNG_MIN) / (LNG_MAX - LNG_MIN) * 100;
+    let yPct = (1 - (lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * 100;
+
+    // Clamp to map edges so dot stays visible even if outside terrain
+    xPct = Math.max(2, Math.min(98, xPct));
+    yPct = Math.max(2, Math.min(98, yPct));
+
     const marker = document.getElementById('user-loc-marker');
     if (marker) {
       marker.style.display = 'block';
       marker.style.left = xPct + '%';
       marker.style.top  = yPct + '%';
     }
-  }, () => {
+
+    // Show distance info if outside festival terrain
+    const onTerrain = lat >= LAT_MIN && lat <= LAT_MAX && lng >= LNG_MIN && lng <= LNG_MAX;
+    if (!onTerrain) {
+      const festLat = (LAT_MIN + LAT_MAX) / 2;
+      const festLng = (LNG_MIN + LNG_MAX) / 2;
+      const R = 6371000;
+      const dLat = (festLat - lat) * Math.PI / 180;
+      const dLng = (festLng - lng) * Math.PI / 180;
+      const a = Math.sin(dLat/2)**2 + Math.cos(lat*Math.PI/180) * Math.cos(festLat*Math.PI/180) * Math.sin(dLng/2)**2;
+      const dist = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+      const distStr = dist >= 1000 ? (dist/1000).toFixed(1) + ' km' : dist + ' m';
+      const msg = lang === 'nl'
+        ? `Je bent ${distStr} van het festival.`
+        : `You are ${distStr} from the festival.`;
+      alert(msg);
+    }
+  }, err => {
     btn.style.color = '';
-    alert(lang==='nl'?'Locatie niet beschikbaar. Controleer je GPS-instellingen.':'Location not available. Check your GPS settings.');
-  }, { enableHighAccuracy: true, timeout: 8000 });
+    const msg = lang === 'nl'
+      ? 'Locatie niet beschikbaar. Controleer je locatie-instellingen in de browser.'
+      : 'Location not available. Check your browser location settings.';
+    alert(msg);
+  }, { enableHighAccuracy: true, timeout: 10000 });
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────

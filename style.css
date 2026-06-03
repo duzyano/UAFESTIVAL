@@ -161,8 +161,8 @@ body {
   display: flex;
   height: calc(var(--nav-h) + var(--safe-b));
   padding-bottom: var(--safe-b);
-  background: var(--bg);
-  border-top: 1px solid var(--border);
+  background: var(--accent);
+  border-top: none;
   flex-shrink: 0;
   z-index: 100;
 }
@@ -176,7 +176,7 @@ body {
   gap: 3px;
   cursor: pointer;
   padding: 8px 0;
-  color: var(--fg2);
+  color: rgba(255, 255, 255, .6);
   transition: color .2s;
   -webkit-tap-highlight-color: transparent;
   border: none;
@@ -186,11 +186,11 @@ body {
 }
 
 .nav-item.active {
-  color: var(--accent);
+  color: #fff;
 }
 
 .nav-item .material-icons-round {
-  font-size: 22px;
+  font-size: 24px;
   transition: transform .2s;
 }
 
@@ -202,6 +202,11 @@ body {
   font-size: 10px;
   letter-spacing: .3px;
   text-transform: uppercase;
+  color: rgba(255, 255, 255, .6);
+}
+
+.nav-item.active .nav-label {
+  color: #fff;
 }
 
 .nav-item::after {
@@ -212,7 +217,7 @@ body {
   transform: translateX(-50%) scaleX(0);
   width: 24px;
   height: 2px;
-  background: var(--accent);
+  background: #fff;
   border-radius: 2px 2px 0 0;
   transition: transform .2s;
 }
@@ -223,8 +228,8 @@ body {
 
 /* HOME */
 .hero-section {
-  background: var(--fg);
-  color: var(--bg);
+  background: #000;
+  color: #fff;
   border-radius: var(--radius);
   padding: 24px 20px;
   margin-bottom: 20px;
@@ -233,7 +238,7 @@ body {
 }
 
 [data-theme="dark"] .hero-section {
-  background: var(--cerulean);
+  background: #000;
 }
 
 .hero-section::before {
@@ -586,43 +591,55 @@ body {
 }
 
 .act-block.stage-poton {
-  background: rgba(240, 50, 40, .15);
-  border-left: 3px solid var(--accent);
+  background: rgba(10, 42, 74, .12);
+  border-left: 3px solid #0a2a4a;
 }
 
 .act-block.stage-thelake {
-  background: rgba(36, 123, 160, .15);
-  border-left: 3px solid var(--cerulean);
+  background: rgba(10, 42, 74, .12);
+  border-left: 3px solid #0a2a4a;
 }
 
 .act-block.stage-theclub {
-  background: rgba(227, 181, 5, .15);
-  border-left: 3px solid var(--saffron);
+  background: rgba(10, 42, 74, .12);
+  border-left: 3px solid #0a2a4a;
 }
 
 .act-block.stage-hanggar {
-  background: rgba(139, 92, 246, .15);
-  border-left: 3px solid var(--purple);
+  background: rgba(10, 42, 74, .12);
+  border-left: 3px solid #0a2a4a;
 }
 
 .act-block.stage-main {
-  background: rgba(240, 50, 40, .15);
-  border-left: 3px solid var(--accent);
+  background: rgba(10, 42, 74, .12);
+  border-left: 3px solid #0a2a4a;
 }
 
 .act-block.stage-cave {
-  background: rgba(36, 123, 160, .15);
-  border-left: 3px solid var(--cerulean);
+  background: rgba(10, 42, 74, .12);
+  border-left: 3px solid #0a2a4a;
 }
 
 .act-block.stage-forest {
-  background: rgba(227, 181, 5, .15);
-  border-left: 3px solid var(--saffron);
+  background: rgba(10, 42, 74, .12);
+  border-left: 3px solid #0a2a4a;
 }
 
 .act-block.stage-underground {
-  background: rgba(139, 92, 246, .15);
-  border-left: 3px solid var(--purple);
+  background: rgba(10, 42, 74, .12);
+  border-left: 3px solid #0a2a4a;
+}
+
+[data-theme="dark"] .act-block.stage-poton,
+[data-theme="dark"] .act-block.stage-thelake,
+[data-theme="dark"] .act-block.stage-theclub,
+[data-theme="dark"] .act-block.stage-hanggar,
+[data-theme="dark"] .act-block.stage-main,
+[data-theme="dark"] .act-block.stage-cave,
+[data-theme="dark"] .act-block.stage-forest,
+[data-theme="dark"] .act-block.stage-underground {
+  background: rgba(91, 159, 212, .15);
+  border-left: 3px solid #5b9fd4;
 }
 
 .act-block.favorite .act-name::after {
